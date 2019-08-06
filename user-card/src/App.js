@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios'
+import './App.css'
 
 class App extends React.Component {
   constructor() {
@@ -7,7 +7,7 @@ class App extends React.Component {
     this.state = {
       card: '',
       followers: [],
-      login: 'dustinmyers'
+      login: undefined
     }
   }
 
@@ -15,6 +15,11 @@ class App extends React.Component {
     this.fetchData()
     this.fetchFollowers()
   }
+
+  // componentDidUpdate = () => {
+  //   this.fetchData()
+  //   this.fetchFollowers()
+  // }
     
 
   fetchData = () => {
@@ -41,17 +46,65 @@ class App extends React.Component {
       .catch(function (response){
           console.log(response)
         })
-  }   
+  } 
+
+  newUser = (user) => {
+    this.setState({login: user})
+    setTimeout(() => {
+      this.fetchData()
+      this.fetchFollowers()
+    }, 100);
+    setTimeout(() => {
+      this.setState({
+      login: ''
+    });
+    }, 110)
+    
+    
+  }
+
+  handleChanges = e => {
+    this.setState({
+      login: e.target.value
+    });
+  };
+
+  submitHandler = (e) => {
+    e.preventDefault()
+    this.fetchData()
+    this.fetchFollowers()
+    this.setState({
+      login: ''
+    });
+
+  } 
 
   
   render() {
     return(
       <div className='card'>
+      <form onSubmit={this.submitHandler}>
+        <input 
+        value={this.state.login} 
+        onChange={this.handleChanges}
+        placeholder={'search for ID'} 
+        />
+      </form>
       {console.log(this.state)}
-        <h1>{this.state.card.login}</h1>
+        <img className='userAvatar' src={this.state.card.avatar_url} />
+        <h1 className='name'>{this.state.card.login}</h1>
+        <p className='location'>{this.state.card.location}</p>
+        <h2>Followers:</h2>
+        <div className='followers'>
         {this.state.followers.map(follower => {
-          return <p>{follower.login}</p>
+          return(
+            <div key={follower.login} className='follower'> 
+            <img className='avatar' src={follower.avatar_url} />
+            <a onClick={() => this.newUser(follower.login)}>{follower.login}</a>
+            </div>
+            )
         })}
+        </div>
       </div>
     )
   }
